@@ -21,8 +21,10 @@ export default function Home() {
       const { NDLKotenOCR } = await import('@nakamura196/ndl-koten-ocr-web');
       const ocr = new NDLKotenOCR();
 
+      const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
+
       await ocr.init({
-        modelPath: '/models/',
+        modelPath: `${basePath}/models/`,
         progressCallback: (percent: number, message: string) => {
           setProgress(`${message} (${percent}%)`);
         }
