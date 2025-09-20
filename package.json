@@ -1,0 +1,35 @@
+{
+  "name": "ndl-koten-ocr-nextjs-app",
+  "version": "1.0.0",
+  "description": "国立国会図書館古典籍OCRのNext.jsアプリケーション",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@nakamura196/ndl-koten-ocr-web": "^1.0.1",
+    "js-yaml": "^4.1.0",
+    "next": "^15.5.3",
+    "onnxruntime-web": "^1.20.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.13",
+    "typescript": "5.9.2",
+    "vite": "^5.0.0"
+  },
+  "keywords": [
+    "ocr",
+    "ndl",
+    "nextjs",
+    "classical-japanese",
+    "text-recognition",
+    "japanese-ocr"
+  ],
+  "author": "nakamura196",
+  "license": "MIT"
+}
