@@ -27,7 +27,6 @@ export default function Home() {
       // モデルファイルとコンフィグファイルを同じディレクトリから読み込む
       await ocr.init({
         modelPath: modelPath,
-        modelSize: 'small',
         progressCallback: (percent: number, message: string) => {
           setProgress(`${message} (${percent}%)`);
         }
