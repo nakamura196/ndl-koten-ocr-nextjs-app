@@ -81,6 +81,10 @@ jspm_packages/
 
 # Next.js build output
 .next
+out/
+
+# Public models (generated on setup)
+/public/models
 
 # Nuxt.js build / generate output
 .nuxt

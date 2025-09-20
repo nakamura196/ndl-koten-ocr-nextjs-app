@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "mkdir -p public/node_modules/@nakamura196/ndl-koten-ocr-web && cp -r node_modules/@nakamura196/ndl-koten-ocr-web/models public/node_modules/@nakamura196/ndl-koten-ocr-web/",
+    "prebuild": "mkdir -p public/models && cp -r node_modules/@nakamura196/ndl-koten-ocr-web/models/* public/models/",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
