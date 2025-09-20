@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import Link from 'next/link';
 
-export default function Home() {
+export default function WorkerPage() {
   const [imageUrl, setImageUrl] = useState('');
   const [result, setResult] = useState('');
   const [jsonResult, setJsonResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState('');
+  const workerRef = useRef<Worker | null>(null);
 
   const handleOCR = async () => {
     if (!imageUrl) return;
@@ -18,34 +20,86 @@ export default function Home() {
     setProgress('初期化中...');
 
     try {
-      const { NDLKotenOCR } = await import('@nakamura196/ndl-koten-ocr-web');
-      const ocr = new NDLKotenOCR();
+      // Web Workerを作成
+      if (!workerRef.current) {
+        const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
+        workerRef.current = new Worker(`${basePath}/ocr.worker.js`);
+      }
 
-      const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
-      const modelPath = `${basePath}/models/`;
+      const worker = workerRef.current;
 
-      // モデルファイルとコンフィグファイルを同じディレクトリから読み込む
-      await ocr.init({
-        modelPath: modelPath,
-        progressCallback: (percent: number, message: string) => {
-          setProgress(`${message} (${percent}%)`);
-        }
-      });
+      // Workerからのメッセージを処理
+      const processWithWorker = () => {
+        return new Promise((resolve, reject) => {
+          const messageHandler = (event: MessageEvent) => {
+            const { type, data, error } = event.data;
 
-      const img = new Image();
-      await new Promise((resolve, reject) => {
-        img.onload = resolve;
-        img.onerror = reject;
-        img.src = imageUrl;
-      });
+            if (type === 'error') {
+              reject(new Error(error));
+            } else if (type === 'init-complete') {
+              setProgress('画像を処理中...');
+              // 初期化完了後、画像処理を開始
+              worker.postMessage({
+                type: 'process',
+                id: 'process-1',
+                data: { imageUrl }
+              });
+            } else if (type === 'process-complete') {
+              worker.removeEventListener('message', messageHandler);
+              resolve(data);
+            }
+          };
 
-      setProgress('処理中...');
-      const ocrResult = await ocr.process(img);
+          worker.addEventListener('message', messageHandler);
+
+          // Workerを初期化
+          const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
+          worker.postMessage({
+            type: 'init',
+            id: 'init-1',
+            data: {
+              modelPath: `${basePath}/models/`
+            }
+          });
+        });
+      };
+
+      const ocrResult: any = await processWithWorker();
       setResult(ocrResult.text || '認識結果なし');
       setJsonResult(ocrResult.json || null);
+
     } catch (error: any) {
-      setResult(`エラー: ${error.message}`);
-      setJsonResult(null);
+      // Web Workerが使えない場合は通常版にフォールバック
+      setProgress('Web Workerが使用できないため、通常版で処理中...');
+
+      try {
+        const { NDLKotenOCR } = await import('@nakamura196/ndl-koten-ocr-web');
+        const ocr = new NDLKotenOCR();
+
+        const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
+        const modelPath = `${basePath}/models/`;
+
+        await ocr.init({
+          modelPath: modelPath,
+          progressCallback: (percent: number, message: string) => {
+            setProgress(`${message} (${percent}%)`);
+          }
+        });
+
+        const img = new Image();
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = imageUrl;
+        });
+
+        const ocrResult = await ocr.process(img);
+        setResult(ocrResult.text || '認識結果なし');
+        setJsonResult(ocrResult.json || null);
+      } catch (fallbackError: any) {
+        setResult(`エラー: ${fallbackError.message}`);
+        setJsonResult(null);
+      }
     } finally {
       setLoading(false);
       setProgress('');
@@ -71,6 +125,26 @@ export default function Home() {
       margin: '0 auto',
       padding: '40px 20px',
     },
+    nav: {
+      display: 'flex',
+      gap: '20px',
+      marginBottom: '32px',
+      borderBottom: '1px solid #e5e5e5',
+      paddingBottom: '16px',
+    },
+    navLink: {
+      color: '#666',
+      textDecoration: 'none',
+      fontSize: '14px',
+      padding: '8px 16px',
+      borderRadius: '6px',
+      transition: 'background-color 0.2s',
+    },
+    navLinkActive: {
+      backgroundColor: '#f5f5f5',
+      color: '#000',
+      fontWeight: '500',
+    },
     header: {
       marginBottom: '48px',
     },
@@ -83,6 +157,17 @@ export default function Home() {
     subtitle: {
       fontSize: '16px',
       color: '#666',
+    },
+    badge: {
+      display: 'inline-block',
+      padding: '4px 8px',
+      backgroundColor: '#000',
+      color: '#fff',
+      fontSize: '11px',
+      fontWeight: '600',
+      borderRadius: '4px',
+      marginLeft: '8px',
+      verticalAlign: 'middle',
     },
     grid: {
       display: 'grid',
@@ -165,49 +250,44 @@ export default function Home() {
       color: '#666',
       marginTop: '8px',
     },
+    info: {
+      padding: '12px 16px',
+      backgroundColor: '#f0f9ff',
+      border: '1px solid #e0f2fe',
+      borderRadius: '6px',
+      fontSize: '13px',
+      color: '#0369a1',
+      marginBottom: '16px',
+    },
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.main}>
-        <nav style={{
-          display: 'flex',
-          gap: '20px',
-          marginBottom: '32px',
-          borderBottom: '1px solid #e5e5e5',
-          paddingBottom: '16px',
-        }}>
-          <a href="/" style={{
-            color: '#000',
-            textDecoration: 'none',
-            fontSize: '14px',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            backgroundColor: '#f5f5f5',
-            fontWeight: '500',
-          }}>
+        <nav style={styles.nav}>
+          <Link href="/" style={styles.navLink}>
             通常版
-          </a>
-          <a href="/worker" style={{
-            color: '#666',
-            textDecoration: 'none',
-            fontSize: '14px',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            transition: 'background-color 0.2s',
-          }}>
+          </Link>
+          <Link href="/worker" style={{...styles.navLink, ...styles.navLinkActive}}>
             Web Worker版
-          </a>
+          </Link>
         </nav>
 
         <header style={styles.header}>
-          <h1 style={styles.title}>NDL古典籍OCR Lite Web版 Next.js利用デモ</h1>
-          <p style={styles.subtitle}>NDL古典籍OCR Liteのブラウザ版をNext.jsで実装したデモアプリケーション</p>
+          <h1 style={styles.title}>
+            NDL古典籍OCR Lite Web版 Next.js利用デモ
+            <span style={styles.badge}>Web Worker</span>
+          </h1>
+          <p style={styles.subtitle}>Web Workerを使用してバックグラウンドで処理を実行（実験的）</p>
         </header>
 
         <div style={styles.grid}>
           <div style={styles.section}>
             <h2 style={styles.sectionTitle}>Input</h2>
+
+            <div style={styles.info}>
+              💡 Web Worker版は実験的な機能です。エラーが発生した場合は通常版にフォールバックします。
+            </div>
 
             <label style={styles.fileLabel}>
               <input
