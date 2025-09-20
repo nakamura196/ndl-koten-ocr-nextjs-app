@@ -22,9 +22,12 @@ export default function Home() {
       const ocr = new NDLKotenOCR();
 
       const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
+      const modelPath = `${basePath}/models/`;
 
+      // モデルファイルとコンフィグファイルを同じディレクトリから読み込む
       await ocr.init({
-        modelPath: `${basePath}/models/`,
+        modelPath: modelPath,
+        modelSize: 'small',
         progressCallback: (percent: number, message: string) => {
           setProgress(`${message} (${percent}%)`);
         }
@@ -169,8 +172,8 @@ export default function Home() {
     <div style={styles.container}>
       <div style={styles.main}>
         <header style={styles.header}>
-          <h1 style={styles.title}>NDL Koten OCR</h1>
-          <p style={styles.subtitle}>古典籍テキスト認識システム</p>
+          <h1 style={styles.title}>NDL古典籍OCR Lite Web版 Next.js利用デモ</h1>
+          <p style={styles.subtitle}>NDL古典籍OCR Liteのブラウザ版をNext.jsで実装したデモアプリケーション</p>
         </header>
 
         <div style={styles.grid}>
