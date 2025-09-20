@@ -22,6 +22,7 @@ export default function Home() {
       const ocr = new NDLKotenOCR();
 
       await ocr.init({
+        modelPath: '/node_modules/@nakamura196/ndl-koten-ocr-web/models/',
         progressCallback: (percent: number, message: string) => {
           setProgress(`${message} (${percent}%)`);
         }
