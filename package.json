@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "mkdir -p public/models && cp -r node_modules/@nakamura196/ndl-koten-ocr-web/models/* public/models/ && mkdir -p public/config && ln -sf ../models/NDLmoji.yaml public/config/NDLmoji.yaml",
+    "prebuild": "mkdir -p public/models && cp -r node_modules/@nakamura196/ndl-koten-ocr-web/models/* public/models/ && mkdir -p public/config && cp public/models/NDLmoji.yaml public/config/",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
