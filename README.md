@@ -16,7 +16,7 @@ npm install
 npm run prebuild
 ```
 
-このコマンドで、OCRに必要なモデルファイルがpublicディレクトリにコピーされます。
+このコマンドで、OCRに必要なモデルファイルが`public/models`ディレクトリにコピーされます。
 
 ### 3. 開発サーバーの起動
 
@@ -55,7 +55,7 @@ npm run dev
 │       ├── layout.tsx    # ルートレイアウト
 │       └── page.tsx       # メインページ（OCR UI）
 ├── public/
-│   └── node_modules/      # OCRモデルファイル
+│   └── models/           # OCRモデルファイル（prebuild時に生成）
 ├── next.config.js         # Next.js設定
 ├── tsconfig.json         # TypeScript設定
 └── package.json          # 依存関係
