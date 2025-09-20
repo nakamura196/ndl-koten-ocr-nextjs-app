@@ -10,20 +10,13 @@
 npm install
 ```
 
-### 2. モデルファイルのコピー
-
-OCRモデルとその設定ファイルをpublicディレクトリにコピーします：
+### 2. モデルファイルの準備
 
 ```bash
-mkdir -p public/node_modules/@nakamura196/ndl-koten-ocr-web
-cp -r node_modules/@nakamura196/ndl-koten-ocr-web/models public/node_modules/@nakamura196/ndl-koten-ocr-web/
+npm run prebuild
 ```
 
-このステップにより、以下のファイルがコピーされます：
-- `rtmdet-s-1280x1280.onnx` (レイアウト検出モデル)
-- `parseq-ndl-32x384-tiny-10.onnx` (文字認識モデル)
-- `NDLmoji.yaml` (文字リスト設定)
-- `ndl.yaml` (システム設定)
+このコマンドで、OCRに必要なモデルファイルがpublicディレクトリにコピーされます。
 
 ### 3. 開発サーバーの起動
 
