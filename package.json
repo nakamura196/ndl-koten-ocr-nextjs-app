@@ -5,9 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "mkdir -p public/node_modules/@nakamura196/ndl-koten-ocr-web && cp -r node_modules/@nakamura196/ndl-koten-ocr-web/models public/node_modules/@nakamura196/ndl-koten-ocr-web/",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next export"
   },
   "dependencies": {
     "@nakamura196/ndl-koten-ocr-web": "^1.0.1",
