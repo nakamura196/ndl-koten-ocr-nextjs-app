@@ -2,6 +2,19 @@
 
 国立国会図書館の古典籍OCRシステムのNext.jsアプリケーション実装です。
 
+## デモ
+
+🌐 [オンラインデモ](https://nakamura196.github.io/ndl-koten-ocr-nextjs-app/)
+
+## 特徴
+
+- ✅ **2つの実行モード**
+  - 通常版：メインスレッドで処理
+  - Web Worker版：バックグラウンドで処理（UIがフリーズしない）
+- ✅ **完全ブラウザ実行** - サーバー不要
+- ✅ **GitHub Pages対応** - 静的サイトとして公開可能
+- ✅ **モダンでシンプルなUI**
+
 ## セットアップ手順
 
 ### 1. 依存関係のインストール
@@ -38,6 +51,8 @@ npm run dev
 - テキスト形式での結果表示
 - JSON形式での詳細情報表示（レイアウト情報、信頼度スコア等）
 - リアルタイム進捗表示
+- Web Worker版でのバックグラウンド処理
+- GitHub Pages対応の静的エクスポート
 - モダンなミニマルUI
 
 ## 技術スタック
@@ -45,7 +60,9 @@ npm run dev
 - **Next.js** 15.5 - Reactベースのフレームワーク
 - **React** 19 - UIライブラリ
 - **TypeScript** - 型安全な開発
-- **@nakamura196/ndl-koten-ocr-web** - OCRエンジン
+- **@nakamura196/ndl-koten-ocr-web** 1.0.6+ - OCRエンジン（Web Worker対応）
+- **ONNX Runtime Web** - 機械学習モデルの実行
+- **Web Workers** - バックグラウンド処理
 
 ## プロジェクト構造
 
@@ -53,22 +70,37 @@ npm run dev
 ├── src/
 │   └── app/
 │       ├── layout.tsx    # ルートレイアウト
-│       └── page.tsx       # メインページ（OCR UI）
+│       ├── page.tsx      # メインページ（通常版）
+│       └── worker/
+│           └── page.tsx  # Web Worker版ページ
 ├── public/
-│   └── models/           # OCRモデルファイル（prebuild時に生成）
-├── next.config.js         # Next.js設定
+│   ├── models/           # OCRモデルファイル（prebuild時に生成）
+│   └── ocr.worker.js     # Web Workerファイル（prebuild時に生成）
+├── scripts/
+│   └── prebuild.sh       # ビルド前処理スクリプト
+├── next.config.js        # Next.js設定
 ├── tsconfig.json         # TypeScript設定
 └── package.json          # 依存関係
 ```
 
 ## ビルド
 
-本番用ビルド:
+### 本番用ビルド
 
 ```bash
 npm run build
 npm run start
 ```
+
+### GitHub Pagesへのデプロイ
+
+```bash
+npm run build
+npm run export
+# out/ディレクトリの内容をGitHub Pagesにアップロード
+```
+
+GitHub Actionsによる自動デプロイも設定済みです。
 
 ## システム要件
 

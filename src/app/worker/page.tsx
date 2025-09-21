@@ -277,7 +277,7 @@ export default function WorkerPage() {
             NDL古典籍OCR Lite Web版 Next.js利用デモ
             <span style={styles.badge}>Web Worker</span>
           </h1>
-          <p style={styles.subtitle}>Web Workerを使用してバックグラウンドで処理を実行（実験的）</p>
+          <p style={styles.subtitle}>Web Workerを使用してバックグラウンドで処理を実行します</p>
         </header>
 
         <div style={styles.grid}>
@@ -285,7 +285,7 @@ export default function WorkerPage() {
             <h2 style={styles.sectionTitle}>Input</h2>
 
             <div style={styles.info}>
-              💡 Web Worker版は現在、ONNX RuntimeのWASM初期化の問題により正常に動作しません。通常版をご利用ください。
+              💡 Web Worker版はバックグラウンドで処理を実行するため、UIがフリーズしません。大きな画像の処理に最適です。
             </div>
 
             <label style={styles.fileLabel}>
