@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [imageUrl, setImageUrl] = useState('');
@@ -177,7 +178,7 @@ export default function Home() {
           borderBottom: '1px solid #e5e5e5',
           paddingBottom: '16px',
         }}>
-          <a href="/" style={{
+          <Link href="/" style={{
             color: '#000',
             textDecoration: 'none',
             fontSize: '14px',
@@ -187,8 +188,8 @@ export default function Home() {
             fontWeight: '500',
           }}>
             通常版
-          </a>
-          <a href="/worker" style={{
+          </Link>
+          <Link href="/worker" style={{
             color: '#666',
             textDecoration: 'none',
             fontSize: '14px',
@@ -197,7 +198,7 @@ export default function Home() {
             transition: 'background-color 0.2s',
           }}>
             Web Worker版
-          </a>
+          </Link>
         </nav>
 
         <header style={styles.header}>
