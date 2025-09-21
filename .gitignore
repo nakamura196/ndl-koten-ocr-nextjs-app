@@ -86,6 +86,11 @@ out/
 # Public models (generated on setup)
 /public/models
 
+# Generated files from prebuild
+/public/*.wasm
+/public/*.mjs
+/public/ocr.worker.js
+
 # Nuxt.js build / generate output
 .nuxt
 

@@ -30,23 +30,50 @@ export default function WorkerPage() {
 
       // Workerからのメッセージを処理
       const processWithWorker = () => {
-        return new Promise((resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
+          let initComplete = false;
+
           const messageHandler = (event: MessageEvent) => {
             const { type, data, error } = event.data;
 
             if (type === 'error') {
               reject(new Error(error));
-            } else if (type === 'init-complete') {
-              setProgress('画像を処理中...');
-              // 初期化完了後、画像処理を開始
-              worker.postMessage({
-                type: 'process',
-                id: 'process-1',
-                data: { imageUrl }
-              });
-            } else if (type === 'process-complete') {
-              worker.removeEventListener('message', messageHandler);
-              resolve(data);
+            } else if (type === 'progress') {
+              setProgress(`${data.message} (${data.progress}%)`);
+            } else if (type === 'success') {
+              if (!initComplete) {
+                // 初期化完了
+                initComplete = true;
+                setProgress('画像を処理中...');
+
+                // 画像をImageDataに変換
+                const img = new Image();
+                img.onload = () => {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+                  const ctx = canvas.getContext('2d');
+                  if (ctx) {
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                    // 画像処理を開始
+                    worker.postMessage({
+                      type: 'process',
+                      id: 'process-1',
+                      data: {
+                        imageData: imageData,
+                        options: {}
+                      }
+                    });
+                  }
+                };
+                img.src = imageUrl;
+              } else {
+                // 処理完了
+                worker.removeEventListener('message', messageHandler);
+                resolve(data);
+              }
             }
           };
 
@@ -58,7 +85,8 @@ export default function WorkerPage() {
             type: 'init',
             id: 'init-1',
             data: {
-              modelPath: `${basePath}/models/`
+              modelPath: `${basePath}/models/`,
+              progressCallback: true
             }
           });
         });
@@ -69,37 +97,8 @@ export default function WorkerPage() {
       setJsonResult(ocrResult.json || null);
 
     } catch (error: any) {
-      // Web Workerが使えない場合は通常版にフォールバック
-      setProgress('Web Workerが使用できないため、通常版で処理中...');
-
-      try {
-        const { NDLKotenOCR } = await import('@nakamura196/ndl-koten-ocr-web');
-        const ocr = new NDLKotenOCR();
-
-        const basePath = process.env.NODE_ENV === 'production' ? '/ndl-koten-ocr-nextjs-app' : '';
-        const modelPath = `${basePath}/models/`;
-
-        await ocr.init({
-          modelPath: modelPath,
-          progressCallback: (percent: number, message: string) => {
-            setProgress(`${message} (${percent}%)`);
-          }
-        });
-
-        const img = new Image();
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = imageUrl;
-        });
-
-        const ocrResult = await ocr.process(img);
-        setResult(ocrResult.text || '認識結果なし');
-        setJsonResult(ocrResult.json || null);
-      } catch (fallbackError: any) {
-        setResult(`エラー: ${fallbackError.message}`);
-        setJsonResult(null);
-      }
+      setResult(`エラー: ${error.message}`);
+      setJsonResult(null);
     } finally {
       setLoading(false);
       setProgress('');
@@ -286,7 +285,7 @@ export default function WorkerPage() {
             <h2 style={styles.sectionTitle}>Input</h2>
 
             <div style={styles.info}>
-              💡 Web Worker版は実験的な機能です。エラーが発生した場合は通常版にフォールバックします。
+              💡 Web Worker版は現在、ONNX RuntimeのWASM初期化の問題により正常に動作しません。通常版をご利用ください。
             </div>
 
             <label style={styles.fileLabel}>
