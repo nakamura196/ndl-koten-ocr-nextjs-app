@@ -199,6 +199,16 @@ export default function Home() {
           }}>
             Web Worker版
           </Link>
+          <Link href="/iiif" style={{
+            color: '#666',
+            textDecoration: 'none',
+            fontSize: '14px',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            transition: 'background-color 0.2s',
+          }}>
+            IIIF版
+          </Link>
         </nav>
 
         <header style={styles.header}>

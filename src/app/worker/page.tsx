@@ -270,6 +270,9 @@ export default function WorkerPage() {
           <Link href="/worker" style={{...styles.navLink, ...styles.navLinkActive}}>
             Web Worker版
           </Link>
+          <Link href="/iiif" style={styles.navLink}>
+            IIIF版
+          </Link>
         </nav>
 
         <header style={styles.header}>
